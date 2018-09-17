@@ -1,3 +1,6 @@
+import io from '@/services/io';
+
+
 var filters = {
   all: function (todos) {
     return todos;
@@ -19,7 +22,7 @@ export default {
 
   state: {
     todos: [],
-    uid: 0,
+    // uid: 0,
     editingTodo: null,
     beforeEditCache: "",
     visibility: "all"
@@ -35,11 +38,11 @@ export default {
   },
 
   mutations: {
-    // clear: (state) => state.todos = [],
+    clear: (state) => state.todos = [],
 
     put: (state, todo) => state.todos.push(todo),
 
-    // putAll: (state, todos) => state.todos = state.todos.concat(todos),
+    putAll: (state, todos) => state.todos = state.todos.concat(todos),
 
     edit: (state, item) => {
       const index = state.todos.findIndex((elem) => {
@@ -65,15 +68,15 @@ export default {
 
   actions: {
 
-    fetchAll({
-      commit,
-      state
+    async fetchAll({
+      commit
     }) {
-      console.log('Fatch all items');
-      // TODO: TBD
+      const todos = await io.todos.fetchAll();
+      commit("clear");
+      commit("putAll", todos)
     },
 
-    addNew({
+    async addNew({
       commit,
       state
     }, value) {
@@ -81,15 +84,14 @@ export default {
       if (!value) {
         return;
       }
-      // Api call
-      commit("put", {
-        id: state.uid++,
+      const todo = await io.todos.addNew({
         title: value,
         completed: false
       });
+      commit("put", todo);
     },
 
-    toggleCompleted({
+    async toggleCompleted({
       commit,
       state
     }, todo) {
@@ -102,9 +104,9 @@ export default {
     },
 
     startEdit({
-        commit,
-        state
-      },
+      commit,
+      state
+    },
       todo) {
       state.beforeEditCache = todo.title;
       state.editingTodo = todo;
@@ -112,9 +114,9 @@ export default {
     },
 
     doneEdit({
-        commit,
-        state
-      },
+      commit,
+      state
+    },
       todo) {
       if (!state.editingTodo) {
         return;
@@ -137,9 +139,9 @@ export default {
     },
 
     cancelEdit({
-        commit,
-        state
-      },
+      commit,
+      state
+    },
       todo) {
       todo.title = this.beforeEditCache;
       state.editingTodo = null;
@@ -147,7 +149,7 @@ export default {
       console.log('cancel edit', todo);
     },
 
-    remove({
+    async remove({
       commit
       /*, state*/
     }, todo) {
@@ -166,12 +168,12 @@ export default {
       });
     },
 
-    setAllDone({
+    async setAllDone({
       commit,
       state
     }) {
       state.todos.forEach(element => {
-        if (!element.completed){
+        if (!element.completed) {
           element.completed = true;
           // Api call
           commit("edit", element);
