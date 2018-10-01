@@ -11,7 +11,7 @@
       <ul class="todo-list">
         <li v-for="todo in filteredTodos" :key="todo.id" class="todo" :class="{completed: todo.completed, editing: todo == editingTodo}">
           <div class="view">
-            <input class="toggle" type="checkbox" :value="todo.completed" @click="toggleTodo(todo)">
+            <input class="toggle" type="checkbox" v-model="todo.completed" @click="toggleTodo(todo)">
             <label @dblclick="startEditTodo(todo)">{{ todo.title }} </label>
             <button class="destroy" @click="removeTodo(todo)"></button>
           </div>
@@ -48,27 +48,23 @@ import { mapState, mapActions, mapMutations, mapGetters } from "vuex";
 
 export default {
   // -- mounted() {
-    created(){
+  created() {
     // this.fetchAllTodos();
-  this.$store.dispatch("todos/fetchAll", this.newTodo);
-
+    this.$store.dispatch("todos/fetchAll", this.newTodo);
   },
 
-  data(){
+  data() {
     return {
-      newTodo:""
+      newTodo: ""
     };
   },
 
   computed: {
-    ...mapState("todos",[
-      "todos",
-      "editingTodo"
-      ]),
-    ...mapGetters("todos" ,{
-      filteredTodos:"filtered", 
-      remainingTodos:"remaining"
-      }),
+    ...mapState("todos", ["todos", "editingTodo"]),
+    ...mapGetters("todos", {
+      filteredTodos: "filtered",
+      remainingTodos: "remaining"
+    }),
 
     allDone: {
       get: function() {
@@ -81,24 +77,23 @@ export default {
   },
 
   methods: {
-    ...mapActions("todos",
-    {
+    ...mapActions("todos", {
       toggleTodo: "toggleCompleted",
-      startEditTodo: "startEdit", 
+      startEditTodo: "startEdit",
       doneEditTodo: "doneEdit",
-      cancelEditTodo:"cancelEdit",
-      removeTodo: "remove"
-    },),
-
-    ...mapMutations("todos", {
-      setFilterTodos : "show"
+      cancelEditTodo: "cancelEdit",
+      removeTodo: "remove",
+      removeCompleted: "removeCompleted"
     }),
 
-addNewTodo(){
-  this.$store.dispatch("todos/addNew", this.newTodo);
-  this.newTodo = "";
-}
+    ...mapMutations("todos", {
+      setFilterTodos: "show"
+    }),
 
+    addNewTodo() {
+      this.$store.dispatch("todos/addNew", this.newTodo);
+      this.newTodo = "";
+    }
   },
 
   filters: {
@@ -108,13 +103,13 @@ addNewTodo(){
   },
 
   directives: {
-    "focus": function(el, binding) {
+    focus: function(el, binding) {
       if (binding.value) {
         el.focus();
       }
     }
   }
-}
+};
 </script>
 
 <style>

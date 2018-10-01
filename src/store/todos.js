@@ -46,7 +46,7 @@ export default {
 
     edit: (state, item) => {
       const index = state.todos.findIndex((elem) => {
-        return elem.id === item.id;
+        return elem._id === item._id;
       });
       // we get back a new object, and we need to get setters to be invoked
       var storedItem = state.todos[index];
@@ -73,7 +73,7 @@ export default {
     }) {
       const todos = await io.todos.fetchAll();
       commit("clear");
-      commit("putAll", todos)
+      commit("putAll", todos);
     },
 
     async addNew({
@@ -84,7 +84,7 @@ export default {
       if (!value) {
         return;
       }
-      const todo = await io.todos.addNew({
+      const todo = await io.todos.add({
         title: value,
         completed: false
       });
@@ -99,8 +99,8 @@ export default {
         return;
       }
       todo.completed = !todo.completed;
-      // API call
-      commit("edit", todo);
+      const edited = await io.todos.edit(todo);
+      commit("edit", edited);
     },
 
     startEdit({
@@ -110,10 +110,9 @@ export default {
       todo) {
       state.beforeEditCache = todo.title;
       state.editingTodo = todo;
-      console.log('start edit', todo);
     },
 
-    doneEdit({
+    async doneEdit({
       commit,
       state
     },
@@ -129,11 +128,11 @@ export default {
 
       todo.title = todo.title.trim();
       if (!todo.title) {
-        // APi call
+        await io.todos.remove(todo);
         commit("remove", todo);
       } else {
-        // APi call
-        commit("edit", todo);
+        const edited = await io.todos.edit(todo);
+        commit("edit", edited);
       }
       state.editingTodo = null;
     },
@@ -161,22 +160,23 @@ export default {
       commit,
       state,
     }) {
-      state.todos.forEach(element => {
-        if (element.completed)
-          // Api call
+      state.todos.forEach(async element => {
+        if (element.completed){
+          await io.todos.remove(element);
           commit("rm", element);
+        }
       });
     },
 
-    async setAllDone({
+    setAllDone({
       commit,
       state
     }) {
-      state.todos.forEach(element => {
+      state.todos.forEach(async element => {
         if (!element.completed) {
           element.completed = true;
-          // Api call
-          commit("edit", element);
+          const edited = await io.todos.edit(element);
+          commit("edit", edited);
         }
       });
     }

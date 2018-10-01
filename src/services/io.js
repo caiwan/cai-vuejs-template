@@ -14,6 +14,11 @@ class BaseIONode {
 
 class Todos extends BaseIONode {
 
+  constructor(io) {
+    super(io)
+    // this.uid = 0;
+  }
+
   fetchAll() {
     return fetch(`${this.root}/tasks/`, {
       credentials: 'same-origin'
@@ -21,18 +26,40 @@ class Todos extends BaseIONode {
       .then(v => v.json());
   }
 
-  add() {}
+  add(todo) {
+    return fetch(`${this.root}/tasks/`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      ...this.io.toJson(todo)
+    })
+      .then(v => v.json());
+  }
 
-  edit() {}
-  remove() {}
+  edit(todo) { 
+    return fetch(`${this.root}/tasks/${todo._id}/`, {
+      method: 'PUT',
+      credentials: 'same-origin',
+      ...this.io.toJson(todo)
+    })
+      .then(v => v.json());
+  }
+
+  remove(todo) { 
+    return fetch(`${this.root}/tasks/${todo._id}/`, {
+      method: 'DELETE',
+      credentials: 'same-origin',
+    })
+  }
 }
 
 class IO {
   constructor() {
     this.headers = null;
-    this.root = '';
+    this.root = './api';
 
     this.todos = null;
+
+    const data = {csrftoken:"nope"}
 
     // this.initialized = fetch('./api/settings/', {
     // credentials: 'same-origin'
@@ -41,9 +68,11 @@ class IO {
     // .then(data =>{
     // this.root = `${data.root}/api`;
 
-    // this.headers = new Headers({'X-CSRFToken': data.csrftoken});
+    this.headers = new Headers({
+     'X-CSRFToken': data.csrftoken
+    });
 
-    this.todos = new Todos();
+    this.todos = new Todos(this);
 
     // })
   }

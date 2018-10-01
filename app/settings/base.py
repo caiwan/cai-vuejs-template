@@ -61,9 +61,9 @@ SOCIAL_BLUEPRINT = {
     # https://developers.facebook.com/apps/
     "flask_social_blueprint.providers.Facebook": {
         # App ID
-        'consumer_key': '1152880561531234',
+        'consumer_key': '197…',
         # App Secret
-        'consumer_secret': '7746b756c1cb6496a264ba666da1b5e4'
+        'consumer_secret': 'c956c1…'
     },
     # https://apps.twitter.com/app/new
     "flask_social_blueprint.providers.Twitter": {
@@ -88,8 +88,3 @@ SOCIAL_BLUEPRINT = {
     },
 }
 
-DATABASE = "sqlite"
-# DATABASE = "postgresql"
-DATABASE_NAME = "fuzzymeat"
-#DATABASE_AUTH = {"user":'fuzzymeatmapp', "password":'fuzzymeatapppassword12345'}
-DATABASE_PATH = "./app.db"
