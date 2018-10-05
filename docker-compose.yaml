@@ -6,7 +6,7 @@ services:
 
   mongo:
     image: mongo
-    restart: always
+    # restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -17,7 +17,7 @@ services:
 
   mongo-express:
     image: mongo-express
-    restart: always
+    # restart: always
     ports:
       - 8081:8081
     environment:
@@ -28,7 +28,7 @@ services:
 
   app:
     build: .
-    restart: always
+    # restart: always
     ports:
       - 5000:5000
     volumes:

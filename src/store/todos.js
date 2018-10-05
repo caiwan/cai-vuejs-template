@@ -150,9 +150,8 @@ export default {
 
     async remove({
       commit
-      /*, state*/
     }, todo) {
-      // + api call
+      await io.todos.remove(todo);
       commit("rm", todo);
     },
 

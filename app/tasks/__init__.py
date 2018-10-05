@@ -3,7 +3,6 @@ import sys
 from flask import request
 import components
 
-# from playhouse.shortcuts import *
 import mongoengine
 
 
@@ -16,10 +15,6 @@ class Task(components.BaseModel):
     pass
 
 # --- controllers
-
-# 204 = no content
-# 201 = created
-# 200 = ok
 
 class TaskListController(components.Controller):
     path = "/tasks/"
