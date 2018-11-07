@@ -4,20 +4,22 @@ import os
 import sys
 import inspect
 
+
+PRODUCTION = (os.getenv("NOTES_PRODUCTION") == 'True')
+DEBUG = (os.getenv("NOTES_DEBUG") == 'True')
+
 logging.basicConfig(
-    format='%(asctime)s %(levelname)-7s %(module)s.%(funcName)s - %(message)s')
-logging.getLogger().setLevel(logging.DEBUG)
+    format='%(asctime)s %(levelname)-7s %(module)s.%(funcName)s - %(message)s') 
+logging.getLogger().setLevel(logging.DEBUG if DEBUG else logging.INFO)
 logging.disable(logging.NOTSET)
 logging.info('Loading %s, app version = %s', __name__, os.getenv('CURRENT_VERSION_ID'))
 
+
+# ---
 # fix import paths for internal imports
 cmd_folder = os.path.dirname(__file__)
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
-
-
-PRODUCTION = __name__ != "__main__"
-DEBUG = not PRODUCTION
 
 
 from components import MyJsonEncoder
@@ -34,8 +36,9 @@ class MyConfig(object):
         import importlib
         try:
             cfg = importlib.import_module(config)
-            logging.debug("Loaded %s" % config)
+            logging.info("Loaded %s" % config)
             app.config.from_object(cfg)
+            # app.config['DEBUG'] = DEBUG
         except ImportError:
             logging.warning("Local settings module not found: %s", config)
 
@@ -53,23 +56,9 @@ api = Api(app)
 # ---
 
 import components
-import tasks
-
-components.database_init(app)
+import tasks 
 
 models = []
 tasks.init(app, api, models)
 
-
-# --- start dev server
-
-# if app.debug and __name__ != '__main__':
-#     from werkzeug.debug import DebuggedApplication
-#     app.wsgi_app = DebuggedApplication(app.wsgi_app, True)
-
-if __name__ == '__main__':
-    logging.debug("PRODUCTION: %s" % PRODUCTION)
-    logging.debug("app.debug: %s" % app.debug)
-    logging.debug("app.testing: %s" % app.testing)
-
-    app.run(host="0.0.0.0", port=5000)
+components.database_init(app, models)
